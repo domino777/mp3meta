@@ -27,4 +27,16 @@
 use warnings;
 use strict;
 
+#	Loading exterla library
+use MP3::Tag;
 
+$ARGV[0] =~ s/[\ \[\]]/[(\\\ )(\\\[)(\\\])]/g;
+
+foreach ( glob($ARGV[0]."*.mp3") ) {
+	print "$_\n";
+	my $mp3File = MP3::Tag->new($_);
+
+	my @mp3Data = $mp3File->autoinfo();
+
+	print "@mp3Data\n\n";
+}
