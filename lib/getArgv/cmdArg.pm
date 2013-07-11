@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-#mp3meta
-#
+#getArg.pm
 #
 #  "Copyright 2013 Mauro Ghedin"
 #
@@ -18,31 +17,38 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
-#
-#
+
 #       @author         : Mauro Ghedin
 #       @contact        : domyno88 at gmail dot com
-#       @version        : 0.1
+#       @version        : 0.2
 
 use warnings;
 use strict;
 
-#	Loading external library
-use MP3::Tag;
+#----------------------------------------------------------------------------------
+#	Return an array with separated argumens
+#----------------------------------------------------------------------------------
 
-#	Loaging mp3meta library
-use lib::getArgv::cmdArg;;
+sub getArgv {
+	my @arguments;
+	foreach (@_) {
+		if(/^-/ && !/^--/) {
+			s/-//;							# removing all dash for having only arguments
+			while (1) {
+				/^([a-zA-Z])/;					# take firs char
+				defined $1 ? push @arguments, $1 : last;	# push or exit
+				s/$1//g if defined $1;				# removing previous char's argumetns if it is defined
+			}
+		}
+		elsif(/^--/) {							# getting argument with double dash
+			s/--//;
+			push @arguments, $_ unless !$_;
+		}
+		else {								# getting other argument
+			push @arguments, $_;
+		}
+	}
+return @arguments;
+}
 
-my @arg = getArgv(@ARGV);
-
-
-#$ARGV[0] =~ s/[\ \[\]]/[(\\\ )(\\\[)(\\\])]/g;
-
-#foreach ( glob($ARGV[0]."*.mp3") ) {
-#	print "$_\n";
-#	my $mp3File = MP3::Tag->new($_);
-#
-#	my @mp3Data = $mp3File->autoinfo();
-#
-#	print "@mp3Data\n\n";
-#}
+1
