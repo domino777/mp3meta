@@ -37,17 +37,19 @@ sub getArgv {
 	my @arguments;
 	foreach (@_) {
 		if(/^-/ && !/^--/) {
-			s/-//;					# removing all dash for having only arguments
-			while (1) {
-				s/$1//g if defined $1;
-				/^([a-zA-Z])/;			# take firs char
-				defined $1 ? push @arguments, $1 : last;
-			}
-		}
-		elsif(/^--/) {
-			s/--//;
-			push @arguments, $_ unless !$_;
+			print "$_\n";
+			s/-//;			# removing all dash for having only arguments
+			do {
+				print "$_\n";
+				/^([a-zA-Z]).*/;	# take firs char
+				if (defined $1) {
+					push @arguments, $1;
+				}
+				s/^$1//;
+				print "$1\t";
+			} while (defined $1);
 		}
 	}
-return @arguments;
 }
+
+getArgv(@ARGV);

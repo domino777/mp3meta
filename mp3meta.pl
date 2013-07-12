@@ -31,10 +31,13 @@ use strict;
 use MP3::Tag;
 
 #	Loaging mp3meta library
-use lib::getArgv::cmdArg;;
+use lib::ARG;;
+use lib::PATH;
 
 my @arg = getArgv(@ARGV);
 
+my @files = lsFolder($arg[0], 1, ".pm|.pl");
+print "@files\n";
 
 #$ARGV[0] =~ s/[\ \[\]]/[(\\\ )(\\\[)(\\\])]/g;
 
