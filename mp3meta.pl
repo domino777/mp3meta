@@ -36,8 +36,11 @@ use lib::PATH;
 
 my @arg = getArgv(@ARGV);
 
+my @fileExt = (".mp3");
+
 my @files = lsFolder($arg[0], 1, ".pm|.pl");
-print "@files\n";
+fileStat(@files, @fileExt);
+#print "@files\n";
 
 #$ARGV[0] =~ s/[\ \[\]]/[(\\\ )(\\\[)(\\\])]/g;
 
