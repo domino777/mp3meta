@@ -36,10 +36,23 @@ use lib::PATH;
 
 my @arg = getArgv(@ARGV);
 
-my @fileExt = (".mp3");
+my @fileExt = ("mp3", "rar", "jpg", "ace");
 
-my @files = lsFolder($arg[0], 1, ".pm|.pl");
-fileStat(@files, @fileExt);
+#my @files = lsFolder($arg[0], 1, @fileExt);
+
+my @files = lsFolder($arg[0]);
+
+my %stat = fileStat(@files, @fileExt);
+
+#print "@files\n";
+foreach (@files) {
+		print "$_\n";
+}
+
+print scalar @files."\n";
+foreach my $key (keys %stat) {
+	print "$key: \t\ $stat{$key}\n";
+}
 #print "@files\n";
 
 #$ARGV[0] =~ s/[\ \[\]]/[(\\\ )(\\\[)(\\\])]/g;

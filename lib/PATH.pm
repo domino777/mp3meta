@@ -20,10 +20,28 @@
 #
 #       @author         : Mauro Ghedin
 #       @contact        : domyno88 at gmail dot com
-#       @version        : 0.2
+#       @version        : 0.3
 
 use warnings;
 use strict;
+
+
+sub fileTypeRegex (\@){
+		my $exts = shift;
+		
+		my $regex;
+				
+		if (defined !@$exts) {
+			foreach my $ext (@$exts) {				#	regex preparation
+					$regex .= $ext."|";
+			}		
+			$regex =~ s/\|$//;
+		}
+		else {
+			$regex = "*";
+		}
+		$regex;
+}
 
 #-------------------------------------------------------------------------------------------------------------
 #	Folder navigation
@@ -31,36 +49,56 @@ use strict;
 #	lsFolder(string: path, int: recursive_mode, string: file_format)
 #
 #	ex:
-#	my @pathlist = lsFolder("/home/my/music", 0, "*.mp3 *.ogg");
+#	my @pathlist = lsFolder("/home/my/music");
 #
 #	NOTE: 
-#	qualcosa da scrivere
+#	return file inside given folder and sub folder
 #
 #-------------------------------------------------------------------------------------------------------------
 
-sub lsFolder {					
-        my $path = shift;
-        my $recursive = shift;
-		my $ext = shift || "*";
-        my @files;
+sub lsFolder {
+#	function arguments		
+		my $mainPath = shift;
 
-        $path =~ s/[\ \[\]]/[(\\\ )(\\\[)(\\\])]/g;
-        $path =~ s/([^\/]$)/$1\//;
+#	local var
+		my @fileHNDLs;
+		my @files;
+		my $path = "";
+		
+		opendir(my $mainPathHNDL, $mainPath) || die "unable to read the $mainPath directory\n";
+		
+		push @fileHNDLs, $mainPathHNDL;
+		
+		print "$mainPath\n";
+		
+		while ((scalar @fileHNDLs) > 0) {
+			
+			#	reading inside folder
+				$_ = readdir($fileHNDLs[scalar @fileHNDLs - 1]);
 
-        foreach my $file (glob("$path*")) {
-                if (-f $file && $file=~ /($ext)$/) {
-                        push @files, $file;
-                }
-                elsif (-d $file) {
-                        push @files, $file;
-                        if ($recursive) {
-                                push @files, lsFolder($file, $recursive, $ext);
-                        }
-                }
-        }
-        return @files;
+				if (!defined $_) {
+					$path =~ s/\/([^\/]*)$//;
+					closedir $fileHNDLs[scalar @fileHNDLs - 1];
+					pop @fileHNDLs;		#	return to previous file handler
+					next;				#	up and recheck
+				}
+				
+				my $relative = $mainPath.$path."/".$_;
+				$relative =~ s/\/+/\//g;
+				
+			#	saving regular file into the array
+				if( -f $relative) {
+					push @files, $relative;
+				}
+				elsif( -d $relative && $_ ne "." && $_ ne "..") {
+					$path .="/".$_;		# append folder finded
+					opendir(my $_tempfHNDL, $mainPath.$path);
+					push @fileHNDLs, $_tempfHNDL;
+				}
+		}
+		
+		@files;
 }
-
 
 #-------------------------------------------------------------------------------------------------------------
 #	Count the number of each given extension inside the given array directory
@@ -87,14 +125,14 @@ sub fileStat (\@\@) {
 				$regex .= $extType."|";
 		}		
 		$regex =~ s/\|$//;
-		
+
 		foreach my $file (@$files) {
-			if (-f $file && $file =~ /($regex)$/) {
-				$statistics{$1}++;
+			if (-f $file && $file =~ /(\.)($regex)$/) {
+				$statistics{$2}++;
 			}
 		}
-		
-		print "$statistics{mp3}\n";
+				
+		return %statistics;
 }
 
 
