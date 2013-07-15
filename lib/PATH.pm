@@ -26,6 +26,19 @@ use warnings;
 use strict;
 
 
+#-------------------------------------------------------------------------------------------------------------
+#	Creating regex rules from array
+#
+#	fileTypeRegex(arrString)
+#
+#	ex:
+#	my $regexRules = fileTypeRegex(@values);
+#
+#	NOTE: 
+#	return a string into scalar from array of given value:	$regex -> "val1|val2|val2"
+#
+#-------------------------------------------------------------------------------------------------------------
+
 sub fileTypeRegex (\@){
 		my $exts = shift;
 		
@@ -38,7 +51,7 @@ sub fileTypeRegex (\@){
 			$regex =~ s/\|$//;
 		}
 		else {
-			$regex = "*";
+			$regex = "";
 		}
 		$regex;
 }
@@ -46,19 +59,20 @@ sub fileTypeRegex (\@){
 #-------------------------------------------------------------------------------------------------------------
 #	Folder navigation
 #
-#	lsFolder(string: path, int: recursive_mode, string: file_format)
+#	lsFolder(string: path, int: recursive_mode)
 #
 #	ex:
-#	my @pathlist = lsFolder("/home/my/music");
+#	my @pathlist = lsFolder("/home/my/music", 1);
 #
 #	NOTE: 
-#	return file inside given folder and sub folder
+#	return file inside given folder and sub folder (if selected)
 #
 #-------------------------------------------------------------------------------------------------------------
 
 sub lsFolder {
 #	function arguments		
 		my $mainPath = shift;
+		my $recursive = shift || 0;
 
 #	local var
 		my @fileHNDLs;
@@ -73,27 +87,31 @@ sub lsFolder {
 		
 		while ((scalar @fileHNDLs) > 0) {
 			
-			#	reading inside folder
+		#	reading inside folder
 				$_ = readdir($fileHNDLs[scalar @fileHNDLs - 1]);
 
-				if (!defined $_) {
-					$path =~ s/\/([^\/]*)$//;
+				if (!defined $_) {										# if $_ is undefined, readdir have reaced the end of the folder at selected handler
+					$path =~ s/\/([^\/]*)$//;							# return to previous folder
 					closedir $fileHNDLs[scalar @fileHNDLs - 1];
-					pop @fileHNDLs;		#	return to previous file handler
-					next;				#	up and recheck
+					pop @fileHNDLs;										# return to previous file handler
+					next;												# up and recheck
 				}
 				
-				my $relative = $mainPath.$path."/".$_;
-				$relative =~ s/\/+/\//g;
+				my $relative = $mainPath.$path."/".$_;					# completing full path
+				$relative =~ s/\/+/\//g;								# cleaning from multiple /
 				
-			#	saving regular file into the array
+		#	saving regular file into the array
 				if( -f $relative) {
-					push @files, $relative;
+					push @files, $relative;								# saving file into array
 				}
-				elsif( -d $relative && $_ ne "." && $_ ne "..") {
-					$path .="/".$_;		# append folder finded
-					opendir(my $_tempfHNDL, $mainPath.$path);
-					push @fileHNDLs, $_tempfHNDL;
+				elsif( -d $relative && $_ ne "." && $_ ne "..") {		# . .. discrimination
+					push @files, $relative;								# saving folder into array
+					
+					if($recursive != 0) {
+						$path .="/".$_;									# append folder finded
+						opendir(my $_tempfHNDL, $mainPath.$path);		# opend new for recursivering mode
+						push @fileHNDLs, $_tempfHNDL;					# save current folder handler
+					}
 				}
 		}
 		
@@ -101,7 +119,7 @@ sub lsFolder {
 }
 
 #-------------------------------------------------------------------------------------------------------------
-#	Count the number of each given extension inside the given array directory
+#	Count the number of extension on given array
 #
 #	fileStat(string: path, int: recursive_mode, string: file_format)
 #
@@ -109,29 +127,40 @@ sub lsFolder {
 #	my %pathlist = fileStat("/home/my/music", 0, ".mp3|.ogg");
 #
 #	NOTE: 
-#	qualcosa da scrivere
+#	Return an hash cointain file tipe as argument and countig as value of the key
 #
 #-------------------------------------------------------------------------------------------------------------
 
 sub fileStat (\@\@) {					
+#	function argument
 		my $files = shift;							#	file list
-		my $ext	= shift;							#	extensions to find
+		my $exts = shift;							#	extensions to find
 		
+#	local var
 		my %statistics;
-		my $regex;
-				
-		foreach my $extType (@$ext) {				#	hash preparation
-				$statistics{$extType} = 0;
-				$regex .= $extType."|";
-		}		
-		$regex =~ s/\|$//;
-
-		foreach my $file (@$files) {
-			if (-f $file && $file =~ /(\.)($regex)$/) {
-				$statistics{$2}++;
+		my $regex; #= fileTypeRegex(@$exts);			#	regex rules creation
+		
+		if (!defined $regex)	{
+			foreach my $file(@$files) {
+				if ( -f $file) {
+					$file =~ s/([a-zA-Z0-9]*)$//;
+					my $ext = lc $1;					# get file extension
+					if ($ext =~ /^[^0-9]/) {
+						exists $statistics{$ext} ? ($statistics{$ext} = $statistics{$ext} + 1) : ($statistics{$ext} = 1);
+						#print "$statistics{$ext}\n";
+					}
+				}
 			}
+		}	
+		else {
+			
 		}
-				
+
+		#foreach my $file (@$files) {
+		#	if (-f $file && $file =~ /(\.)($regex)$/) {
+		#		$statistics{$2}++;
+		#	}
+		#}
 		return %statistics;
 }
 

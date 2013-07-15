@@ -40,14 +40,14 @@ my @fileExt = ("mp3", "rar", "jpg", "ace");
 
 #my @files = lsFolder($arg[0], 1, @fileExt);
 
-my @files = lsFolder($arg[0]);
+my @files = lsFolder($arg[0], 1);
 
 my %stat = fileStat(@files, @fileExt);
 
 #print "@files\n";
-foreach (@files) {
-		print "$_\n";
-}
+#foreach (@files) {
+#		print "$_\n";
+#}
 
 print scalar @files."\n";
 foreach my $key (keys %stat) {
