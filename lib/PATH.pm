@@ -133,34 +133,22 @@ sub lsFolder {
 
 sub fileStat (\@\@) {					
 #	function argument
-		my $files = shift;							#	file list
-		my $exts = shift;							#	extensions to find
+		my $files = shift;								#	file list
+		my $exts = shift;								#	extensions to find
 		
 #	local var
 		my %statistics;
-		my $regex; #= fileTypeRegex(@$exts);			#	regex rules creation
+		my $regex = fileTypeRegex(@$exts);				#	regex rules creation
 		
-		if (!defined $regex)	{
-			foreach my $file(@$files) {
-				if ( -f $file) {
-					$file =~ s/([a-zA-Z0-9]*)$//;
-					my $ext = lc $1;					# get file extension
-					if ($ext =~ /^[^0-9]/) {
-						exists $statistics{$ext} ? ($statistics{$ext} = $statistics{$ext} + 1) : ($statistics{$ext} = 1);
-						#print "$statistics{$ext}\n";
-					}
+		foreach my $file(@$files) {
+			if ( -f $file) {
+				$file =~ /([a-zA-Z0-9]*)$/;
+				my $ext = lc $1;						# get file extension
+				if( $ext ne "" && ( defined $regex && $ext =~ /$regex/i ) || ( !defined $regex && $ext =~ /^[^0-9]/ )) {
+					exists $statistics{$ext} ? ($statistics{$ext} = $statistics{$ext} + 1) : ($statistics{$ext} = 1);
 				}
 			}
-		}	
-		else {
-			
 		}
-
-		#foreach my $file (@$files) {
-		#	if (-f $file && $file =~ /(\.)($regex)$/) {
-		#		$statistics{$2}++;
-		#	}
-		#}
 		return %statistics;
 }
 

@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-#mp3meta
-#
+#MP3.pml
 #
 #  "Copyright 2013 Mauro Ghedin"
 #
@@ -19,7 +18,6 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #
-#
 #       @author         : Mauro Ghedin
 #       @contact        : domyno88 at gmail dot com
 #       @version        : 0.1
@@ -30,26 +28,31 @@ use strict;
 #	Loading external library
 use MP3::Tag;
 
-#	Loaging mp3meta library
-use lib::ARG;;
-use lib::PATH;
-use lib::MP3;
 
-my @arg = getArgv(@ARGV);
+#-------------------------------------------------------------------------------------------------------------
+#	Generate a statistic about the mp3 file
+#
+#	funcName(string: path, int: recursive_mode, string: file_format)
+#
+#	ex:
+#	my %pathlist = fileStat("/home/my/music", 0, ".mp3|.ogg");
+#
+#	NOTE: 
+#	Return an hash cointain file tipe as argument and countig as value of the key
+#
+#-------------------------------------------------------------------------------------------------------------
 
-my @fileExt = ("mp3", "ogg");
+sub mp3stat (\@) {
+	my $mp3s = shift;
+	
+	foreach my $mp3 (@$mp3s) {
+		$mp3 =~ /([a-zA-Z0-9]*)$/;
+		my $ext = lc $1;
+		if ( -f $mp3 && $ext eq "mp3") {
+			print "$mp3\n";
+		}
+	}
+}
 
-my @files = lsFolder($arg[0], 1);
 
-my %stat = fileStat(@files, @fileExt);
-
-mp3stat(@files);
-#print "@files\n";
-#foreach (@files) {
-#		print "$_\n";
-#}
-
-#print scalar @files."\n";
-#foreach my $key (keys %stat) {
-#	print "$key: \t\ $stat{$key}\n";
-#}
+1
