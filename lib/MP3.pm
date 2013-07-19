@@ -30,7 +30,7 @@ use MP3::Tag;
 
 
 #-------------------------------------------------------------------------------------------------------------
-#	Generate a statistic about the mp3 file
+#	Generate a statistic about the mp3 files
 #
 #	funcName(string: path, int: recursive_mode, string: file_format)
 #
@@ -45,12 +45,58 @@ use MP3::Tag;
 sub mp3stat (\@) {
 	my $mp3s = shift;
 	
+	#	var: file info
+	#my $title, my $track, my $artist, my $album, my $comment, my $year, my $genres;
+	my @mp3Tags;
+	my @titles, my @tracks, my @artists, my @albums, my @comments, my @years, my @genreses;
+	my @Tags = ( \@titles, \@tracks, \@artists, \@albums, \@comments, \@years, \@genreses );
+	
+	my $total = scalar @$mp3s;
+	my $count;
 	foreach my $mp3 (@$mp3s) {
 		$mp3 =~ /([a-zA-Z0-9]*)$/;
 		my $ext = lc $1;
 		if ( -f $mp3 && $ext eq "mp3") {
-			print "$mp3\n";
+			my $mp3obj = MP3::Tag->new($mp3);
+			#($title, $track, $artist, $album, $comment, $year, $genres) = $mp3obj->autoinfo();
+			@mp3Tags = $mp3obj->autoinfo();
+			for my $key (2, 3, 5, 6) {
+				if (defined $Tags[$key]->[0]) {
+					#push @Tags[$key], $mp3Tags[$key];	
+					#print "Defined: $Tags[$key]->[0]\n";
+					#print "I'am in\n";
+					my $rrr = scalar @{$Tags[1]};
+					#print "$rrr\n";
+					my $toPush = 0;
+					foreach my $tagsKey (0..(scalar @{$Tags[$key]} - 1)) {
+						#print "$mp3Tags[$key]    $Tags[$key]->[$tagsKey] ----- $tagsKey\n";
+						$toPush = 0;
+						last if ($mp3Tags[$key] eq "" || lc $mp3Tags[$key] eq lc $Tags[$key]->[$tagsKey]);
+						$toPush = 1;
+					}
+					if ($toPush) {
+						push @{$Tags[$key]}, $mp3Tags[$key];
+					}
+					#print "I'am out\n";
+				}
+				else {
+					push @{$Tags[$key]}, $mp3Tags[$key];	
+					print "Undefined: $Tags[$key]->[0]\n";
+				}
+#				print "$Tags[0]";
+			}
 		}
+		
+		#last if ($count == 2000);
+		$count++;
+		my $proc = $count * 100 / $total;
+		$|=1;
+		printf "\r %d", $proc;
+		print " %";
+	}
+	sleep 2;
+	foreach my $printMe (@{$Tags[6]}) {
+		print "$printMe\n";
 	}
 }
 
