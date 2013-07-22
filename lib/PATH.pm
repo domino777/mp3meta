@@ -20,11 +20,12 @@
 #
 #       @author         : Mauro Ghedin
 #       @contact        : domyno88 at gmail dot com
-#       @version        : 0.3
+#       @version        : 0.4
 
 use warnings;
 use strict;
 
+use lib::PBAR;
 
 #-------------------------------------------------------------------------------------------------------------
 #	Creating regex rules from array
@@ -71,8 +72,9 @@ sub fileTypeRegex (\@){
 
 sub lsFolder {
 #	function arguments		
-		my $mainPath = shift;
-		my $recursive = shift || 0;
+		my $mainPath 	= shift;
+		my $recursive 	= shift || 0;
+		my $progress	= shift || 0;
 
 #	local var
 		my @fileHNDLs;
@@ -82,9 +84,7 @@ sub lsFolder {
 		opendir(my $mainPathHNDL, $mainPath) || die "unable to read the $mainPath directory\n";
 		
 		push @fileHNDLs, $mainPathHNDL;
-		
-		print "$mainPath\n";
-		
+				
 		while ((scalar @fileHNDLs) > 0) {
 			
 		#	reading inside folder
@@ -104,17 +104,21 @@ sub lsFolder {
 				if( -f $relative) {
 					push @files, $relative;								# saving file into array
 				}
+				
 				elsif( -d $relative && $_ ne "." && $_ ne "..") {		# . .. discrimination
 					push @files, $relative;								# saving folder into array
 					
 					if($recursive != 0) {
 						$path .="/".$_;									# append folder finded
-						opendir(my $_tempfHNDL, $mainPath.$path);		# opend new for recursivering mode
+						opendir(my $_tempfHNDL, $mainPath.$path);		# opend new for recursiveing mode
 						push @fileHNDLs, $_tempfHNDL;					# save current folder handler
 					}
 				}
+			if ($progress) {
+				showRBar();
+			}
 		}
-		
+				
 		@files;
 }
 
@@ -141,15 +145,17 @@ sub fileStat (\@\@) {
 		my $regex = fileTypeRegex(@$exts);				#	regex rules creation
 		
 		foreach my $file(@$files) {
+			
 			if ( -f $file) {
 				$file =~ /([a-zA-Z0-9]*)$/;
-				my $ext = lc $1;						# get file extension
+				my $ext = lc $1;	
+									# get file extension
 				if( $ext ne "" && ( defined $regex && $ext =~ /$regex/i ) || ( !defined $regex && $ext =~ /^[^0-9]/ )) {
 					exists $statistics{$ext} ? ($statistics{$ext} = $statistics{$ext} + 1) : ($statistics{$ext} = 1);
 				}
 			}
 		}
-		return %statistics;
+		%statistics;
 }
 
 

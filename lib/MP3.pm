@@ -27,6 +27,7 @@ use strict;
 
 #	Loading external library
 use MP3::Tag;
+use lib::PBAR;
 
 
 #-------------------------------------------------------------------------------------------------------------
@@ -42,62 +43,54 @@ use MP3::Tag;
 #
 #-------------------------------------------------------------------------------------------------------------
 
-sub mp3stat (\@) {
-	my $mp3s = shift;
+sub mp3stat (\@$) {
 	
-	#	var: file info
-	#my $title, my $track, my $artist, my $album, my $comment, my $year, my $genres;
+#	function argument
+	my $mp3s 	= shift;
+	my $showBar = shift || 0;
+	
+#	local var
 	my @mp3Tags;
 	my @titles, my @tracks, my @artists, my @albums, my @comments, my @years, my @genreses;
-	my @Tags = ( \@titles, \@tracks, \@artists, \@albums, \@comments, \@years, \@genreses );
+	my @Tags = \( @titles, @tracks, @artists, @albums, @comments, @years, @genreses );
 	
-	my $total = scalar @$mp3s;
-	my $count;
+	my $cnt = 0;
 	foreach my $mp3 (@$mp3s) {
-		$mp3 =~ /([a-zA-Z0-9]*)$/;
-		my $ext = lc $1;
-		if ( -f $mp3 && $ext eq "mp3") {
-			my $mp3obj = MP3::Tag->new($mp3);
-			#($title, $track, $artist, $album, $comment, $year, $genres) = $mp3obj->autoinfo();
-			@mp3Tags = $mp3obj->autoinfo();
-			for my $key (2, 3, 5, 6) {
-				if (defined $Tags[$key]->[0]) {
-					#push @Tags[$key], $mp3Tags[$key];	
-					#print "Defined: $Tags[$key]->[0]\n";
-					#print "I'am in\n";
-					my $rrr = scalar @{$Tags[1]};
-					#print "$rrr\n";
-					my $toPush = 0;
-					foreach my $tagsKey (0..(scalar @{$Tags[$key]} - 1)) {
-						#print "$mp3Tags[$key]    $Tags[$key]->[$tagsKey] ----- $tagsKey\n";
-						$toPush = 0;
-						last if ($mp3Tags[$key] eq "" || lc $mp3Tags[$key] eq lc $Tags[$key]->[$tagsKey]);
-						$toPush = 1;
+		$mp3 =~ /([a-zA-Z0-9]*)$/;									#	getting file extension
+		
+		if ( -f $mp3 && lc $1 eq "mp3") {
+			my $mp3obj = MP3::Tag->new($mp3);						#	create MP3::Tag object
+			@mp3Tags = $mp3obj->autoinfo();							#	getting mp3's info
+			
+			for my $tagIndex (2, 3, 5, 6) {		
+							
+				if (defined $Tags[$tagIndex]->[0]) {				#	check data initialization
+						
+					foreach my $tagsKey (0..@{$Tags[$tagIndex]} - 1) {			
+																	#	V skip on duplicated value
+						last if ($mp3Tags[$tagIndex] eq "" || lc $mp3Tags[$tagIndex] eq lc $Tags[$tagIndex]->[$tagsKey]);
+																	#	V save value, else next
+						$tagsKey == (scalar @{$Tags[$tagIndex]} - 1) ? push @{$Tags[$tagIndex]}, $mp3Tags[$tagIndex] : next;
 					}
-					if ($toPush) {
-						push @{$Tags[$key]}, $mp3Tags[$key];
-					}
-					#print "I'am out\n";
+
 				}
 				else {
-					push @{$Tags[$key]}, $mp3Tags[$key];	
-					print "Undefined: $Tags[$key]->[0]\n";
+					push @{$Tags[$tagIndex]}, $mp3Tags[$tagIndex];	#	initialize first element data
 				}
-#				print "$Tags[0]";
 			}
 		}
-		
-		#last if ($count == 2000);
-		$count++;
-		my $proc = $count * 100 / $total;
-		$|=1;
-		printf "\r %d", $proc;
-		print " %";
+		if ($showBar) {
+			$cnt++;
+			showPBar(scalar @$mp3s, $cnt, 120);
+		}
 	}
-	sleep 2;
-	foreach my $printMe (@{$Tags[6]}) {
-		print "$printMe\n";
-	}
+# DEBUG LINES START -----------------------------------------------
+	#foreach my $lll (@{$Tags[2]}) {
+	#	print "$lll\n";
+	#}
+# DEBUG LINES END -----------------------------------------------
+
+	\@Tags;															#	return data
 }
 
 

@@ -23,6 +23,7 @@
 #       @author         : Mauro Ghedin
 #       @contact        : domyno88 at gmail dot com
 #       @version        : 0.1
+#package class::mp3info;
 
 use warnings;
 use strict;
@@ -35,15 +36,46 @@ use lib::ARG;;
 use lib::PATH;
 use lib::MP3;
 
+     use threads;
+    use threads::shared;
+use class::mp3info;
+
 my @arg = getArgv(@ARGV);
 
 my @fileExt = ("mp3", "ogg");
 
-my @files = lsFolder($arg[0], 1);
+print "Getting file from folder  ";
+
+print "\nRetriveing files infromation... ";
+
+my @files = lsFolder($arg[0], 1, 1);
+
+
 
 my %stat = fileStat(@files, @fileExt);
 
-mp3stat(@files);
+
+my $thr1 = threads->create(
+sub {
+my $TagStat = mp3stat(@files, 1);
+
+#foreach my $coll (@{$TagStat}) {
+#	foreach my $row (@{$coll}){
+#		print "$row";	
+#	}
+#	print "\n";
+#}
+});
+print "---------------------- CLASS --------------------\n";
+
+my $obj = mp3info->new(path => "hello");
+print $obj->getPath();
+print "\n";
+print "-------------------- CLASS END  -----------------\n";
+	
+my @res2 = $thr1->join();
+
+print "\nProcess completed\n";
 #print "@files\n";
 #foreach (@files) {
 #		print "$_\n";
