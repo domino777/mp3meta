@@ -52,30 +52,26 @@ my @files = lsFolder($arg[0], 1, 1);
 
 
 
-my %stat = fileStat(@files, @fileExt);
+my @stat = fileStat(@files, @fileExt);
 
 
-my $thr1 = threads->create(
-sub {
 my $TagStat = mp3stat(@files, 1);
 
-#foreach my $coll (@{$TagStat}) {
-#	foreach my $row (@{$coll}){
-#		print "$row";	
-#	}
-#	print "\n";
-#}
-});
-print "---------------------- CLASS --------------------\n";
 
-my $obj = mp3info->new(path => "hello");
-print $obj->getPath();
-print "\n";
-print "-------------------- CLASS END  -----------------\n";
+#print "---------------------- CLASS --------------------\n";
+
+#my $obj = mp3info->new(path => "hello");
+#print $obj->getPath();
+#print "\n";
+#print "-------------------- CLASS END  -----------------\n";
 	
-my @res2 = $thr1->join();
+#my @res2 = $thr1->join();
 
 print "\nProcess completed\n";
+
+
+my @data = TagContentMatcher(@{$TagStat->[2]}, "bassimaestro");
+
 #print "@files\n";
 #foreach (@files) {
 #		print "$_\n";

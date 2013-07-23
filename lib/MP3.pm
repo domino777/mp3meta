@@ -84,14 +84,38 @@ sub mp3stat (\@$) {
 			showPBar(scalar @$mp3s, $cnt, 120);
 		}
 	}
-# DEBUG LINES START -----------------------------------------------
-	#foreach my $lll (@{$Tags[2]}) {
-	#	print "$lll\n";
-	#}
-# DEBUG LINES END -----------------------------------------------
 
 	\@Tags;															#	return data
 }
 
+
+sub TagContentMatcher (\@$) {
+#	function argument
+	my $TagsContent = shift;
+	my $TagMatcher	= shift;
+	
+#	local var
+	my @matches;
+	
+	my $TagMatcherInv = $TagMatcher;
+	$TagMatcherInv =~ s/[\ \-]/\.\?/g;
+	
+	foreach my $content (@$TagsContent) {
+			#print "$content\n";
+			my $contentInv = $content;
+			$contentInv =~ s/[\ \-]/\.\?/g;
+			
+			if ($content =~ /$TagMatcherInv/gi) {
+				print "Direct:\t\t$TagMatcher ----- ";
+				print "$content\n";
+			}
+			elsif ($TagMatcher =~ /$contentInv/gi){
+				print "Inverse:\t$TagMatcher ----- ";
+				print "$content\n";
+			}
+	}
+	
+	@matches;
+}
 
 1
