@@ -25,6 +25,19 @@
 use warnings;
 use strict;
 
+#-------------------------------------------------------------------------------------------------------------
+#	Print a progress bar
+#
+#	showPBar(int: total_item_count, int: item_processed, int: length of the bar)
+#
+#	ex:
+#	showPBar($total, $count, 10);
+#
+#	NOTE: 
+#	Aspect -->		[#############------------------------------] 30%
+#
+#-------------------------------------------------------------------------------------------------------------
+
 sub showPBar ($$$) {
 	my $itemNo 	= 	shift;
 	my $itemCnt = 	shift;
@@ -46,10 +59,8 @@ sub showPBar ($$$) {
 		$barOut .= " ";
 	}
 	
-	#$barOut .= "\b\]%2.0f",$percent;
 	$barOut .= "\]";
-	#$barOut .= "%";
-	
+
 	print "$barOut";
 	printf "%2.0f",$percent;
 	print "%";
@@ -59,6 +70,19 @@ sub showPBar ($$$) {
 	}
 }
 
+
+#-------------------------------------------------------------------------------------------------------------
+#	Print rotative progressive char
+#
+#	showRBar()
+#
+#	ex:
+#	showRBar();
+#
+#	NOTE: 
+#	Aspect -->			\ 		-> 		| 		-> 		/ 		-> 		-
+#					1st cycl	->	2nd cycl	->	3rd cycle	->	4th cycle
+#-------------------------------------------------------------------------------------------------------------
 
 my $RBarCrnt = 0;
 

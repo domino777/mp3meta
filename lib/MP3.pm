@@ -20,72 +20,63 @@
 #
 #       @author         : Mauro Ghedin
 #       @contact        : domyno88 at gmail dot com
-#       @version        : 0.1
+#       @version        : 0.2
 
 use warnings;
 use strict;
 
 #	Loading external library
-use MP3::Tag;
-use lib::PBAR;
+use lib::PBAR;		#	progress bar library
 
 
 #-------------------------------------------------------------------------------------------------------------
 #	Generate a statistic about the mp3 files
 #
-#	funcName(string: path, int: recursive_mode, string: file_format)
+#	mp3stat(mp3info_object, string: tag, int: show_progress_bar)
 #
 #	ex:
-#	my %pathlist = fileStat("/home/my/music", 0, ".mp3|.ogg");
+#	my @uniqueTagValue = mp3stat(@mp3ss, "author", 1);
 #
 #	NOTE: 
-#	Return an hash cointain file tipe as argument and countig as value of the key
+#	Return an array that contain all unique value of selected tag
 #
 #-------------------------------------------------------------------------------------------------------------
 
-sub mp3stat (\@$) {
+sub mp3stat (\@$$) {
 	
 #	function argument
 	my $mp3s 	= shift;
+	my $tagSel	= shift;
 	my $showBar = shift || 0;
 	
 #	local var
 	my @mp3Tags;
-	my @titles, my @tracks, my @artists, my @albums, my @comments, my @years, my @genreses;
-	my @Tags = \( @titles, @tracks, @artists, @albums, @comments, @years, @genreses );
-	
+	my @UniqueTag;
+#	counter for gBar
 	my $cnt = 0;
+	
 	foreach my $mp3 (@$mp3s) {
-		$mp3 =~ /([a-zA-Z0-9]*)$/;									#	getting file extension
 		
-		if ( -f $mp3 && lc $1 eq "mp3") {
-			my $mp3obj = MP3::Tag->new($mp3);						#	create MP3::Tag object
-			@mp3Tags = $mp3obj->autoinfo();							#	getting mp3's info
-			
-			for my $tagIndex (2, 3, 5, 6) {		
-							
-				if (defined $Tags[$tagIndex]->[0]) {				#	check data initialization
-						
-					foreach my $tagsKey (0..@{$Tags[$tagIndex]} - 1) {			
-																	#	V skip on duplicated value
-						last if ($mp3Tags[$tagIndex] eq "" || lc $mp3Tags[$tagIndex] eq lc $Tags[$tagIndex]->[$tagsKey]);
-																	#	V save value, else next
-						$tagsKey == (scalar @{$Tags[$tagIndex]} - 1) ? push @{$Tags[$tagIndex]}, $mp3Tags[$tagIndex] : next;
-					}
-
-				}
-				else {
-					push @{$Tags[$tagIndex]}, $mp3Tags[$tagIndex];	#	initialize first element data
-				}
+		my $tagVal = $mp3->getInfo($tagSel);														#	get tag value
+		
+		next unless $tagVal;																		#	skip if tag value is not defined
+		
+			if (!defined $UniqueTag[0]) {															#	write first value for array initialization
+				push  @UniqueTag, $tagVal;	
 			}
-		}
+			
+			for my $index (0..scalar @UniqueTag - 1) {								
+				last if (lc $tagVal eq lc $UniqueTag[$index]);										#	skip on duplicated value
+				$index == (scalar @UniqueTag - 1) ? push  @UniqueTag, $tagVal : next;				#	save value at the and - save not matched value
+			}
+		
 		if ($showBar) {
 			$cnt++;
-			showPBar(scalar @$mp3s, $cnt, 120);
+			showPBar(scalar @$mp3s, $cnt, 100);
 		}
 	}
-
-	\@Tags;															#	return data
+	
+	@UniqueTag;															#	return data
 }
 
 
