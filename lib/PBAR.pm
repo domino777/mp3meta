@@ -43,7 +43,9 @@ sub showPBar ($$$) {
 	my $itemCnt = 	shift;
 	my $barLen 	=	shift || 20;
 	
-	my $percent = $itemCnt * 100 / $itemNo;			#	percentage calculation
+	my $percent;
+	
+	$itemCnt != $itemNo ? $percent = $itemCnt * 100 / $itemNo : $percent = 100;			#	percentage calculation
 	
 	my $varLen = $barLen * $percent / 100;			#	bar lenght calculation
 	

@@ -33,18 +33,18 @@ sub getArgv {
 	my @arguments;
 	foreach (@_) {
 		if(/^-/ && !/^--/) {
-			s/-//;							# removing all dash for having only arguments
+			s/-//;											# removing all dash for having only arguments
 			while (1) {
-				/^([a-zA-Z])/;					# take firs char
+				/^([a-zA-Z])/;								# take firs char
 				defined $1 ? push @arguments, $1 : last;	# push or exit
-				s/$1//g if defined $1;				# removing previous char's argumetns if it is defined
+				s/$1//g if defined $1;						# removing previous char's argumetns if it is defined
 			}
 		}
-		elsif(/^--/) {							# getting argument with double dash
+		elsif(/^--/) {										# getting argument with double dash
 			s/--//;
 			push @arguments, $_ unless !$_;
 		}
-		else {								# getting other argument
+		else {												# getting other argument
 			push @arguments, $_;
 		}
 	}

@@ -72,7 +72,7 @@ sub mp3stat (\@$$) {
 		
 		if ($showBar) {
 			$cnt++;
-			showPBar(scalar @$mp3s, $cnt, 100);
+			showPBar(scalar @$mp3s, $cnt, 20);
 		}
 	}
 	
@@ -108,5 +108,40 @@ sub TagContentMatcher (\@$) {
 	
 	@matches;
 }
+
+
+#-------------------------------------------------------------------------------------------------------------
+#	Generate a statistic about the mp3 files
+#
+#	mp3stat(mp3info_object, string: tag, int: show_progress_bar)
+#
+#	ex:
+#	my @uniqueTagValue = mp3stat(@mp3ss, "author", 1);
+#
+#	NOTE: 
+#	Return an array that contain all unique value of selected tag
+#
+#-------------------------------------------------------------------------------------------------------------
+
+sub mp3byTagVal (\@$$) {
+#	function argument
+	my $mp3s 			= shift;	
+	my $tagName			= shift;	
+	my $toFind		 	= shift;
+
+#	local var
+	my @mp3sResult;
+	
+	foreach my $mp3 (@$mp3s) {
+		if (defined $mp3 && lc $mp3->getInfo($tagName) eq lc $toFind) {
+			push @mp3sResult, $mp3;
+		}
+	}
+	
+	@mp3sResult
+}
+
+
+
 
 1
