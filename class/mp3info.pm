@@ -24,7 +24,11 @@
 
 package mp3info;
 
+use lib::frameId;
+
 use MP3::Tag;
+use MP3::Tag::ID3v2;
+
 
 use warnings;
 use strict;
@@ -62,20 +66,30 @@ sub fileInit {
 		my $title, my $track, my $artist, my $album, my $comment, my $year, my $genres;
 		
 		my $mp3obj = MP3::Tag->new($self->{path});													#	object init
+		$mp3obj->get_tags();																		#	get tag type
+		$self->{MP3TagObj} = $mp3obj;																#	save obj if exists ID3v2 tags
+				
+		my $val = $mp3obj->{ID3v2}->get_frame_ids('truename');
+		foreach my $lll (keys %$val) {
+			print $lll." = ".$mp3obj->{ID3v2}->get_frame($lll)." - ";
+		}
 		
 		($self->{tags}->{title}, 	$self->{tags}->{track}, 
 		 $self->{tags}->{artist}, 	$self->{tags}->{album},
 		 $self->{tags}->{comment}, 	$self->{tags}->{year},
 									$self->{tags}->{genres} ) = $mp3obj->autoinfo();				#	getting mp3's info
+									
+		print "   ".$self->{tags}->{artist}."\n";
 		
 }
 
 #---------------------------------------------------------------------------------------------------
-#	Return a single tag information by tag selection
+#	Return/write a single tag information by tag selection
 #---------------------------------------------------------------------------------------------------
-sub getInfo {
+sub tagValue {
 		my $self 	= shift;
 		my $key 	= shift;
+		my $val		= shift;
 		
 		if (!defined $key) {	
 			die "No argument defined on method: getInfo\n";
@@ -84,6 +98,7 @@ sub getInfo {
 			die "fileInit method not called or \"$key\" argument is invalid\n";
 		}
 		else {
+			$self->{tags}->{$key} = $val if defined;
 			return $self->{tags}->{$key};
 		}
 }
@@ -91,7 +106,7 @@ sub getInfo {
 #---------------------------------------------------------------------------------------------------
 #	Return an array of tag information
 #---------------------------------------------------------------------------------------------------
-sub getInofos {
+sub tagValues {
 		my $self 	= shift;
 		
 		return ( $self->{tags}->{title},	$self->{tags}->{track}, 
@@ -125,6 +140,31 @@ sub tagsName {
 		
 		return keys $self->{tags};
 }
+
+#---------------------------------------------------------------------------------------------------
+#	Write new tag on mp3
+#---------------------------------------------------------------------------------------------------
+sub tagWrite {
+		my $self = shift;
+		
+		foreach my $tagKey ( keys $self->{tags} ) {
+			last if exists $self->{MP3TagObj}->{ID3v2};
+			( defined $self->{MP3TagObj}->{ID3v2}->change_frame($frID3v2->{$tagKey}, $self->{tags}->{$tagKey}) ) ? 
+				next : $self->{MP3TagObj}->add_frame($frID3v2->{$tagKey}, $self->{tags}->{$tagKey});
+		} #:	$self->{MP3TagObj}->new_tag("ID3v2");
+				
+				
+			#~ ( defined $self->{MP3TagObj}->{ID3v2}->change_frame(TITLE, $self->{tags}->{title}) ) ? 
+				#~ last : $self->{MP3TagObj}->add_frame(TITLE, $self->{tags}->{title});
+			#~ $self->{MP3TagObj}->change_frame(ARTIST, $self->{tags}->{artist});
+			#~ $self->{MP3TagObj}->change_frame(TRKNO, $self->{tags}->{track});
+			#~ $self->{MP3TagObj}->change_frame(ALBUM, $self->{tags}->{album});
+			#~ $self->{MP3TagObj}->change_frame(YEAR, $self->{tags}->{year});
+			#~ $self->{MP3TagObj}->change_frame(GENRES, $self->{tags}->{genres});
+		#~ } : $self->{MP3TagObj}->new_tag("ID3v2");
+
+}
+
 
 
 1;

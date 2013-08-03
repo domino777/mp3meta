@@ -80,51 +80,57 @@ foreach my $file (@files) {
 	}
 }
 
-#foreach my $kk ($mp3sObj[1]->tagsName()) {
-#	my @stat =  mp3stat(@mp3sObj, $kk, 1);
-#	print "\n";
-	#foreach (@stat) {
-	#	print "$_ ---- ";
+#print "\nCalcolo infomazioni tag";
+
+$mp3sObj[(scalar @mp3sObj) - 1]->tagValue("artist", "The black keys");
+$mp3sObj[(scalar @mp3sObj) - 1]->tagWrite();
+#$mp3sObj[(scalar @mp3sObj) - 1]->{MP3TagObj}->{ID3v2}
+
+#~ foreach my $kk ($mp3sObj[1]->tagsName()) {
+	#~ my @stat =  mp3stat(@mp3sObj, $kk, 1);
+	#~ print "\n";
+	#~ foreach (@stat) {
+		#~ print "$_ ---- ";
+	#~ }
+	#~ print "\n\n-----\n\n";
+#~ }
+#~ 
+#~ my @orderTag = ("artist", "album");
+#~ my @tagByValue = @mp3sObj;
+#~ 
+#~ my $counter;
+#~ foreach (@mp3sObj) {
+	#~ if ( !defined $_) {
+		#~ next;
+	#~ }
+	#~ my @tagByValue = @mp3sObj;
+	#~ foreach my $orderIndex (@orderTag) {
+		#~ my $firstIndex = 0;
+		#~ if ($orderIndex eq $orderTag[0]) {
+			#~ for my $firstValid (0..scalar @tagByValue) {
+				#~ if ( defined $tagByValue[$firstValid] ) {
+					#~ $firstIndex = $firstValid;
+					#~ last;
+				#~ }
+			#~ }
+		#~ }
+		#~ @tagByValue = mp3byTagVal(@tagByValue, $orderIndex, $tagByValue[$firstIndex]->getInfo($orderIndex));	
+	#~ }
+	#~ 
+	#for my $objIndex (0..scalar @mp3sObj - 1) {
+		#if ( defined $mp3sObj[$objIndex] && lc $mp3sObj[$objIndex]->getInfo($orderTag[0]) eq lc $tagByValue[0]->getInfo($orderTag[0])) {
+			#$mp3sObj[$objIndex] = undef;
+		#}
 	#}
-	#print "\n\n-----\n\n";
+	
+	#foreach (@tagByValue) {
+		#print "Album: ".$_->getInfo("album")." ---> Artist: ".$_->getInfo("artist")." ----> Year: ".$_->getInfo("year")." ----> Genres: ".$_->getInfo("genres")."\n";
+		#$counter++;
+	#}
+	#print "\n ----####----\n";
 #}
-
-my @orderTag = ("album", "year", "genres");
-my @tagByValue = @mp3sObj;
-
-my $counter;
-foreach (@mp3sObj) {
-	if ( !defined $_) {
-		next;
-	}
-	my @tagByValue = @mp3sObj;
-	foreach my $orderIndex (@orderTag) {
-		my $firstIndex = 0;
-		if ($orderIndex eq $orderTag[0]) {
-			for my $firstValid (0..scalar @tagByValue) {
-				if ( defined $tagByValue[$firstValid] ) {
-					$firstIndex = $firstValid;
-					last;
-				}
-			}
-		}
-		@tagByValue = mp3byTagVal(@tagByValue, $orderIndex, $tagByValue[$firstIndex]->getInfo($orderIndex));	
-	}
-	
-	for my $objIndex (0..scalar @mp3sObj - 1) {
-		if ( defined $mp3sObj[$objIndex] && lc $mp3sObj[$objIndex]->getInfo($orderTag[0]) eq lc $tagByValue[0]->getInfo($orderTag[0])) {
-			$mp3sObj[$objIndex] = undef;
-		}
-	}
-	
-	foreach (@tagByValue) {
-		print "Album: ".$_->getInfo("album")." ---> Artist: ".$_->getInfo("artist")." ----> Year: ".$_->getInfo("year")." ----> Genres: ".$_->getInfo("genres")."\n";
-		$counter++;
-	}
-	print "\n ----####----\n";
-}
  
-print "Song catalogized: $counter\n";
+#print "Song catalogized: $counter\n";
 #my $obj = mp3info->new("/run/media/domyno/Elements/Documenti/MusicTst/Fish_-_Robe_Grosse-2005-MSC/01_Grossa_Feat.Esa-MSC.mp3");
 #print $obj->getPath();
 #$obj->fileInit();
