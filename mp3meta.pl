@@ -81,8 +81,10 @@ foreach my $file (@files) {
 }
 
 #print "\nCalcolo infomazioni tag";
-
 $mp3sObj[(scalar @mp3sObj) - 1]->tagValue("artist", "The black keys");
+$mp3sObj[(scalar @mp3sObj) - 1]->tagValue("album", "To mare vacca");
+$mp3sObj[(scalar @mp3sObj) - 1]->tagValue("genres", "Rock");
+$mp3sObj[(scalar @mp3sObj) - 1]->tagValue("year", "2003");
 $mp3sObj[(scalar @mp3sObj) - 1]->tagWrite();
 #$mp3sObj[(scalar @mp3sObj) - 1]->{MP3TagObj}->{ID3v2}
 

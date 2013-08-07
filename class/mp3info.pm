@@ -24,15 +24,65 @@
 
 package mp3info;
 
-use lib::frameId;
+#require lib::frameId;
 
 use MP3::Tag;
 use MP3::Tag::ID3v2;
+MP3::Tag->config(write_v24 => 1, prohibit_v24 => 1);
 
 
 use warnings;
 use strict;
 
+my %frID3v2 = (
+				artist	=> "TPE1",		#	Lead performer(s)/Soloist(s)
+				album	=> "TALB",		#	Album/Movie/Show title
+				title	=> "TIT2",		#	Title/songname/content description
+				year	=> "TDRC", 		#"TYER",		#	Year (replaced by TDRC in v2.4)
+				genres	=> "TCON",		#	Content type
+				track	=> "TRCK",		#	Track number/Position in set
+				comment	=> "COMM"		#	Track number/Position in set
+			);
+	 #~ TALB Album/Movie/Show title
+	 #~ TBPM BPM (beats per minute)
+	 #~ TCOM Composer
+	 #~ TCON Content type
+	 #~ TCOP Copyright message
+	 #~ TDAT Date (replaced by TDRC in v2.4)
+	 #~ TDLY Playlist delay
+	 #~ TENC Encoded by
+	 #~ TEXT Lyricist/Text writer
+	 #~ TFLT File type
+	 #~ TIME Time (replaced by TDRC in v2.4)
+	 #~ TIT1 Content group description
+	 #~ TIT2 Title/songname/content description
+	 #~ TIT3 Subtitle/Description refinement
+	 #~ TKEY Initial key
+	 #~ TLAN Language(s)
+	 #~ TLEN Length
+	 #~ TMED Media type
+	 #~ TOAL Original album/movie/show title
+	 #~ TOFN Original filename
+	 #~ TOLY Original lyricist(s)/text writer(s)
+	 #~ TOPE Original artist(s)/performer(s)
+	 #~ TORY Original release year (replaced by TDOR in v2.4)
+	 #~ TOWN File owner/licensee
+	 #~ TPE1 Lead performer(s)/Soloist(s)
+	 #~ TPE2 Band/orchestra/accompaniment
+	 #~ TPE3 Conductor/performer refinement
+	 #~ TPE4 Interpreted, remixed, or otherwise modified by
+	 #~ TPOS Part of a set
+	 #~ TPUB Publisher
+	 #~ TRCK Track number/Position in set
+	 #~ TRDA Recording dates (replaced by TDRC in v2.4)
+	 #~ TRSN Internet radio station name
+	 #~ TRSO Internet radio station owner
+	 #~ TSIZ Size (deprecated in v2.4)
+	 #~ TSRC ISRC (international standard recording code)
+	 #~ TSSE Software/Hardware and settings used for encoding
+	 #~ TYER Year (replaced by TDRC in v2.4)
+	 #~ TXXX User defined text information frame
+	 
 #---------------------------------------------------------------------------------------------------
 #
 #	mp3info Class - initialized with file name + file path like /var/media/disck/doc/song.mp3 
@@ -66,10 +116,11 @@ sub fileInit {
 		my $title, my $track, my $artist, my $album, my $comment, my $year, my $genres;
 		
 		my $mp3obj = MP3::Tag->new($self->{path});													#	object init
+		
 		$mp3obj->get_tags();																		#	get tag type
 		$self->{MP3TagObj} = $mp3obj;																#	save obj if exists ID3v2 tags
 				
-		my $val = $mp3obj->{ID3v2}->get_frame_ids('truename');
+		my $val = $self->{MP3TagObj}->{ID3v2}->get_frame_ids('truename');
 		foreach my $lll (keys %$val) {
 			print $lll." = ".$mp3obj->{ID3v2}->get_frame($lll)." - ";
 		}
@@ -79,8 +130,9 @@ sub fileInit {
 		 $self->{tags}->{comment}, 	$self->{tags}->{year},
 									$self->{tags}->{genres} ) = $mp3obj->autoinfo();				#	getting mp3's info
 									
-		print "   ".$self->{tags}->{artist}."\n";
-		
+									
+		#~ print "   ".$self->{tags}->{year}."\n";
+		print "\n";
 }
 
 #---------------------------------------------------------------------------------------------------
@@ -98,7 +150,7 @@ sub tagValue {
 			die "fileInit method not called or \"$key\" argument is invalid\n";
 		}
 		else {
-			$self->{tags}->{$key} = $val if defined;
+			$self->{tags}->{$key} = $val if defined $val;
 			return $self->{tags}->{$key};
 		}
 }
@@ -143,15 +195,21 @@ sub tagsName {
 
 #---------------------------------------------------------------------------------------------------
 #	Write new tag on mp3
-#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------			
 sub tagWrite {
 		my $self = shift;
-		
+
 		foreach my $tagKey ( keys $self->{tags} ) {
-			last if exists $self->{MP3TagObj}->{ID3v2};
-			( defined $self->{MP3TagObj}->{ID3v2}->change_frame($frID3v2->{$tagKey}, $self->{tags}->{$tagKey}) ) ? 
-				next : $self->{MP3TagObj}->add_frame($frID3v2->{$tagKey}, $self->{tags}->{$tagKey});
-		} #:	$self->{MP3TagObj}->new_tag("ID3v2");
+			#print $tagKey."  ".$frID3v2{$tagKey}."\n";
+			#last if exists $self->{MP3TagObj}->{ID3v2};
+			if ($tagKey ne "comment" && defined $self->{tags}->{$tagKey} ) {
+				( defined $self->{MP3TagObj}->{ID3v2}->change_frame($frID3v2{$tagKey}, $self->{tags}->{$tagKey}) ) ? 
+						next : print $self->{MP3TagObj}->{ID3v2}->add_frame($frID3v2{$tagKey}, $self->{tags}->{$tagKey});
+			}
+		} 
+		print $self->{MP3TagObj}->{ID3v2}->get_frame('TPE1');
+		print $self->{MP3TagObj}->{ID3v2}->write_tag(0);
+		#:	$self->{MP3TagObj}->new_tag("ID3v2");
 				
 				
 			#~ ( defined $self->{MP3TagObj}->{ID3v2}->change_frame(TITLE, $self->{tags}->{title}) ) ? 
