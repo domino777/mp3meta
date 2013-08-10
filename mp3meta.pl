@@ -37,6 +37,7 @@ use lib::PATH;
 use lib::MP3;
 use lib::strCmp;
 
+
 use threads;
 use threads::shared;
 use class::mp3info;
@@ -80,7 +81,8 @@ foreach my $file (@files) {
 	}
 }
 
-print fndLiteral("the black", "the black keys");
+fndHard("heloe","helo there");
+
 #print "\nCalcolo infomazioni tag";
 
 

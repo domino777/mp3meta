@@ -20,7 +20,7 @@
 #
 #       @author         : Mauro Ghedin
 #       @contact        : domyno88 at gmail dot com
-#       @version        : 0.1
+#       @version        : 0.     1
 
 
 #---------------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@
 #	my $found = fndLiteral("llo", "Hello world");
 #
 #	NOTE: 
-#	Return 1 if string is fount into the other string
+#	Return 1 if string is found into the other string
 #
 #---------------------------------------------------------------------------------------------------
 
@@ -42,5 +42,70 @@ sub fndLiteral ($$) {
 	
 	return ( $str2 =~ /$str1/ig ? 1 : 0);		#	return true if str1 is in str2
 }
+
+#---------------------------------------------------------------------------------------------------
+#	Find literally a string into an other but non apha-numeric charset are removed
+#
+#	fndCollapse(string: string_to_find, string: string_were_find)
+#
+#	ex:
+#	my $found = fndCollapse("llo wor", "Hello -#%£ world");
+#
+#	NOTE: 
+#	Return 1 if string is found into the other string
+#
+#
+#---------------------------------------------------------------------------------------------------
+
+sub fndCollapse ($$) {
+	$str1 = shift;	#	string to find
+	$str2 = shift;	#	string were find
+	
+	$str1 =~ s/[^\w\d]//g;
+	$str2 =~ s/[^\w\d]//g;
+	
+	return ( $str2 =~ /$str1/ig ? 1 : 0);		#	return true if str1 is in str2
+}
+
+sub fndHard ($$) {
+	my @arStr1 = strToArray(lc shift);
+	my @arStr2 = strToArray(lc shift);
+	
+	my $pMtch = undef;
+	my $matched = 0;
+	my $unmatchCnt = 0;
+	my $_gap = 2;
+	
+	print "\nString1: @arStr1\t\t\t".scalar @arStr1."\n";
+	print "String2: @arStr2\t\t".scalar @arStr2."\n";
+	
+	for ( my $p1 = (scalar @arStr1 - 1); $p1 > -1; $p1-- ) {
+		for ( my $p2 = (scalar @arStr2 - 1); $p2 > -1; $p2-- ) {
+
+			if ( $arStr1[$p1] eq $arStr2[$p2] ) {
+				print "$arStr1[$p1]"." = "."$arStr2[$p2] -- $p2"."\n";
+				print "@arStr1"." -- "."@arStr2"."\n";
+				if ( $pMtch == undef ) { $pMtch = $p2; }
+				$matched++;			
+				last;
+			}
+			elsif ( $pMtch != undef ) { $unmatchCnt++; }
+			else {	pop @arStr2	};
+			#print "Match: $matched --- UnMatch: $unmatchCnt\n";
+			
+			#if ( $pMtch == undef ) { pop @arStr2; next }
+			
+			if ( defined $pMtch && ($pMtch - $p2) > $_gap ) { 
+				print "CLEAR\n";
+				$pMtch = undef;
+				$matched = 0;
+				$unmatchCnt = 0;
+				$p1 = (scalar @arStr1 - 1);
+			}
+		}
+	}
+			
+			#( defined $pMatch && ($pMatch - $p2) > _gap )? $pMatch = undef: 
+}	
 
 1;

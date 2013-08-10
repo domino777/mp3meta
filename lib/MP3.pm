@@ -27,6 +27,7 @@ use strict;
 
 #	Loading external library
 use lib::PBAR;		#	progress bar library
+use lib::base::strExd;
 
 
 #-------------------------------------------------------------------------------------------------------------
