@@ -79,32 +79,17 @@ sub fndHard ($$) {
 	print "\nString1: @arStr1\t\t\t".scalar @arStr1."\n";
 	print "String2: @arStr2\t\t".scalar @arStr2."\n";
 	
-	for ( my $p1 = (scalar @arStr1 - 1); $p1 > -1; $p1-- ) {
-		for ( my $p2 = (scalar @arStr2 - 1); $p2 > -1; $p2-- ) {
-
+	for ( my $p1; $p1 > scalar @arStr1 - 1; $p1++ ) {
+		for ( my $p2; $p2 > scalar @arStr2 - 1; $p2++ ) {
 			if ( $arStr1[$p1] eq $arStr2[$p2] ) {
-				print "$arStr1[$p1]"." = "."$arStr2[$p2] -- $p2"."\n";
-				print "@arStr1"." -- "."@arStr2"."\n";
-				if ( $pMtch == undef ) { $pMtch = $p2; }
-				$matched++;			
-				last;
-			}
-			elsif ( $pMtch != undef ) { $unmatchCnt++; }
-			else {	pop @arStr2	};
-			#print "Match: $matched --- UnMatch: $unmatchCnt\n";
+				$pMtch = $p2 if undef $pMtch;
+			}	
 			
-			#if ( $pMtch == undef ) { pop @arStr2; next }
-			
-			if ( defined $pMtch && ($pMtch - $p2) > $_gap ) { 
-				print "CLEAR\n";
-				$pMtch = undef;
-				$matched = 0;
-				$unmatchCnt = 0;
-				$p1 = (scalar @arStr1 - 1);
-			}
 		}
+		if ( $unmatch => 2 ) { $p1 = (scalar @arStr1 - 1) };
 	}
 			
+	print "Match: $matched --- UnMatch: $unmatchCnt\n";
 			#( defined $pMatch && ($pMatch - $p2) > _gap )? $pMatch = undef: 
 }	
 

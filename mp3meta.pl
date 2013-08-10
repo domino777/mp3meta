@@ -81,7 +81,7 @@ foreach my $file (@files) {
 	}
 }
 
-fndHard("heloe","helo there");
+fndHard("hello","helo there");
 
 #print "\nCalcolo infomazioni tag";
 
