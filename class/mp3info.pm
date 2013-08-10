@@ -24,8 +24,6 @@
 
 package mp3info;
 
-#require lib::frameId;
-
 use MP3::Tag;
 use MP3::Tag::ID3v2;
 MP3::Tag->config(write_v24 => 1, prohibit_v24 => 1);
@@ -33,8 +31,8 @@ MP3::Tag->config(write_v24 => 1, prohibit_v24 => 1);
 
 use warnings;
 use strict;
-
-my %frID3v2 = (
+	 
+our %frID3v2 = (
 				artist	=> "TPE1",		#	Lead performer(s)/Soloist(s)
 				album	=> "TALB",		#	Album/Movie/Show title
 				title	=> "TIT2",		#	Title/songname/content description
@@ -82,6 +80,7 @@ my %frID3v2 = (
 	 #~ TSSE Software/Hardware and settings used for encoding
 	 #~ TYER Year (replaced by TDRC in v2.4)
 	 #~ TXXX User defined text information frame
+	 
 	 
 #---------------------------------------------------------------------------------------------------
 #
@@ -158,7 +157,7 @@ sub tagValue {
 #---------------------------------------------------------------------------------------------------
 #	Return an array of tag information
 #---------------------------------------------------------------------------------------------------
-sub tagValues {
+sub getValues {
 		my $self 	= shift;
 		
 		return ( $self->{tags}->{title},	$self->{tags}->{track}, 
@@ -189,7 +188,6 @@ sub tagCount {
 #---------------------------------------------------------------------------------------------------
 sub tagsName {
 		my $self = shift;
-		
 		return keys $self->{tags};
 }
 
@@ -199,28 +197,15 @@ sub tagsName {
 sub tagWrite {
 		my $self = shift;
 
-		foreach my $tagKey ( keys $self->{tags} ) {
-			#print $tagKey."  ".$frID3v2{$tagKey}."\n";
-			#last if exists $self->{MP3TagObj}->{ID3v2};
+		$self->{MP3TagObj}->new_tag('ID3v2') if !exists $self->{MP3TagObj}->{ID3v2};				#	ID3v2 tag creation if not exists
+		
+		foreach my $tagKey ( keys $self->{tags} ) {													#	frame value creation or renameing
 			if ($tagKey ne "comment" && defined $self->{tags}->{$tagKey} ) {
 				( defined $self->{MP3TagObj}->{ID3v2}->change_frame($frID3v2{$tagKey}, $self->{tags}->{$tagKey}) ) ? 
 						next : print $self->{MP3TagObj}->{ID3v2}->add_frame($frID3v2{$tagKey}, $self->{tags}->{$tagKey});
 			}
 		} 
-		print $self->{MP3TagObj}->{ID3v2}->get_frame('TPE1');
-		print $self->{MP3TagObj}->{ID3v2}->write_tag(0);
-		#:	$self->{MP3TagObj}->new_tag("ID3v2");
-				
-				
-			#~ ( defined $self->{MP3TagObj}->{ID3v2}->change_frame(TITLE, $self->{tags}->{title}) ) ? 
-				#~ last : $self->{MP3TagObj}->add_frame(TITLE, $self->{tags}->{title});
-			#~ $self->{MP3TagObj}->change_frame(ARTIST, $self->{tags}->{artist});
-			#~ $self->{MP3TagObj}->change_frame(TRKNO, $self->{tags}->{track});
-			#~ $self->{MP3TagObj}->change_frame(ALBUM, $self->{tags}->{album});
-			#~ $self->{MP3TagObj}->change_frame(YEAR, $self->{tags}->{year});
-			#~ $self->{MP3TagObj}->change_frame(GENRES, $self->{tags}->{genres});
-		#~ } : $self->{MP3TagObj}->new_tag("ID3v2");
-
+		return $self->{MP3TagObj}->{ID3v2}->write_tag(0);											#	write tag on mp3file - return 1 if write operation is terminated sucesfulyl
 }
 
 

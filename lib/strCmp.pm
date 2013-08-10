@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#perly.pl
+#strCmp.pm
 #
 #  "Copyright 2013 Mauro Ghedin"
 #
@@ -17,39 +17,30 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
-
+#
 #       @author         : Mauro Ghedin
 #       @contact        : domyno88 at gmail dot com
-#       @version        : 3.0-beta-1
+#       @version        : 0.1
 
-# TODO
-#       Aggiungere le chiavi da rimuovere da file txt esterno .lst
-#       Gestire erro (fatto) -- gestire u' errori
-#       Aggiungere lista estensioni da controllare in .cfg
-#       Scrivere man
-#       deafult da .cfg?
-#       LOG?
 
-use warnings;
-use strict;
+#---------------------------------------------------------------------------------------------------
+#	Find literally a string into an other
+#
+#	fndLiteral(string: string_to_find, string: string_were_find)
+#
+#	ex:
+#	my $found = fndLiteral("llo", "Hello world");
+#
+#	NOTE: 
+#	Return 1 if string is fount into the other string
+#
+#---------------------------------------------------------------------------------------------------
 
-sub getArgv {
-	my @arguments;
-	foreach (@_) {
-		if(/^-/ && !/^--/) {
-			print "$_\n";
-			s/-//;			# removing all dash for having only arguments
-			do {
-				print "$_\n";
-				/^([a-zA-Z]).*/;	# take firs char
-				if (defined $1) {
-					push @arguments, $1;
-				}
-				s/^$1//;
-				print "$1\t";
-			} while (defined $1);
-		}
-	}
+sub fndLiteral ($$) {
+	$str1 = shift;	#	string to find
+	$str2 = shift;	#	string were find
+	
+	return ( $str2 =~ /$str1/ig ? 1 : 0);		#	return true if str1 is in str2
 }
 
-getArgv(@ARGV);
+1;

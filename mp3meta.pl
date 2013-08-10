@@ -35,6 +35,7 @@ use MP3::Tag;
 use lib::ARG;;
 use lib::PATH;
 use lib::MP3;
+use lib::strCmp;
 
 use threads;
 use threads::shared;
@@ -70,8 +71,7 @@ my @files = lsFolder($arg[0], 1, 1);
 
 my @mp3sObj;
 
-print "\n---------------------- CLASS --------------------\n";
-
+# MP3 object creation and initialization
 foreach my $file (@files) {
 	if (-f $file && $file =~ /\.mp3$/){
 		my $obj = mp3info->new($file);
@@ -80,13 +80,9 @@ foreach my $file (@files) {
 	}
 }
 
+print fndLiteral("the black", "the black keys");
 #print "\nCalcolo infomazioni tag";
-$mp3sObj[(scalar @mp3sObj) - 1]->tagValue("artist", "The black keys");
-$mp3sObj[(scalar @mp3sObj) - 1]->tagValue("album", "To mare vacca");
-$mp3sObj[(scalar @mp3sObj) - 1]->tagValue("genres", "Rock");
-$mp3sObj[(scalar @mp3sObj) - 1]->tagValue("year", "2003");
-$mp3sObj[(scalar @mp3sObj) - 1]->tagWrite();
-#$mp3sObj[(scalar @mp3sObj) - 1]->{MP3TagObj}->{ID3v2}
+
 
 #~ foreach my $kk ($mp3sObj[1]->tagsName()) {
 	#~ my @stat =  mp3stat(@mp3sObj, $kk, 1);

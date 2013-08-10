@@ -92,7 +92,6 @@ sub TagContentMatcher (\@$) {
 	$TagMatcherInv =~ s/[\ \-]/\.\?/g;
 	
 	foreach my $content (@$TagsContent) {
-			#print "$content\n";
 			my $contentInv = $content;
 			$contentInv =~ s/[\ \-]/\.\?/g;
 			

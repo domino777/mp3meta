@@ -28,7 +28,7 @@ use strict;
 use lib::PBAR;
 
 #-------------------------------------------------------------------------------------------------------------
-#	Creating regex rules from array
+#	Creating regex rules from given array
 #
 #	fileTypeRegex(arrString)
 #
@@ -131,7 +131,8 @@ sub lsFolder {
 #	my %pathlist = fileStat("/home/my/music", 0, ".mp3|.ogg");
 #
 #	NOTE: 
-#	Return an hash cointain file tipe as argument and countig as value of the key
+#	Return an hash cointain file tipe as argument and countig as value of the key like	{_mp3} => 59
+#																						{_txt} => 4
 #
 #-------------------------------------------------------------------------------------------------------------
 
@@ -151,7 +152,7 @@ sub fileStat (\@\@) {
 				my $ext = lc $1;	
 									# get file extension
 				if( $ext ne "" && ( defined $regex && $ext =~ /$regex/i ) || ( !defined $regex && $ext =~ /^[^0-9]/ )) {
-					exists $statistics{$ext} ? ($statistics{$ext} = $statistics{$ext} + 1) : ($statistics{$ext} = 1);
+					exists $statistics{'_'.$ext} ? ($statistics{'_'.$ext} = $statistics{$ext} + 1) : ($statistics{$ext} = 1);
 				}
 			}
 		}
