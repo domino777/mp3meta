@@ -81,7 +81,7 @@ foreach my $file (@files) {
 	}
 }
 
-fndHard("hello","helo there");
+print LevenshteinLen("hello world","hola world");
 
 #print "\nCalcolo infomazioni tag";
 

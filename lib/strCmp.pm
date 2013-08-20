@@ -20,8 +20,10 @@
 #
 #       @author         : Mauro Ghedin
 #       @contact        : domyno88 at gmail dot com
-#       @version        : 0.     1
+#       @version        : 0.1
 
+
+use lib::base::base;
 
 #---------------------------------------------------------------------------------------------------
 #	Find literally a string into an other
@@ -67,30 +69,36 @@ sub fndCollapse ($$) {
 	return ( $str2 =~ /$str1/ig ? 1 : 0);		#	return true if str1 is in str2
 }
 
-sub fndHard ($$) {
+sub LevenshteinLen ($$) {
 	my @arStr1 = strToArray(lc shift);
 	my @arStr2 = strToArray(lc shift);
 	
-	my $pMtch = undef;
-	my $matched = 0;
-	my $unmatchCnt = 0;
-	my $_gap = 2;
+	my @d;
 	
-	print "\nString1: @arStr1\t\t\t".scalar @arStr1."\n";
-	print "String2: @arStr2\t\t".scalar @arStr2."\n";
-	
-	for ( my $p1; $p1 > scalar @arStr1 - 1; $p1++ ) {
-		for ( my $p2; $p2 > scalar @arStr2 - 1; $p2++ ) {
-			if ( $arStr1[$p1] eq $arStr2[$p2] ) {
-				$pMtch = $p2 if undef $pMtch;
-			}	
-			
-		}
-		if ( $unmatch => 2 ) { $p1 = (scalar @arStr1 - 1) };
+	for my $indx (0..scalar @arStr1 ) {																#	Levenshtein matrix init ( x axe)
+		$d[$indx][0] =  $indx;
 	}
+	
+	for my $indx (0..scalar @arStr2 ) {																#	Levenshtein matrix init ( y axe)
+		$d[0][$indx] =  $indx;
+	}
+	
+	for my $y (1..scalar @{ $d[0] } - 1) {
+		for my $x (1..scalar @d - 1 ) {
+			if ( $arStr1[$x - 1] eq $arStr2[$y - 1] ) {
+				$d[$x][$y] = $d[$x - 1][$y - 1];
+			}
+			else {
+				$d[$x][$y] = min( 
+								$d[$x - 1][$y] + 1, 				#	deletion
+								$d[$x][$y - 1] + 1, 				#	insertion
+								$d[$x - 1][$y - 1] + 1 );			#	substitution
+			}
+		}
+	}
+	
+	return $d[scalar @d - 1][scalar @{ $d[0] } - 1];
 			
-	print "Match: $matched --- UnMatch: $unmatchCnt\n";
-			#( defined $pMatch && ($pMatch - $p2) > _gap )? $pMatch = undef: 
 }	
 
 1;
