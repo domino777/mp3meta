@@ -81,7 +81,7 @@ foreach my $file (@files) {
 	}
 }
 
-print LevenshteinLen("hello world","hola world");
+print damerauLevenshteinLenght("ramstein","live ramstein aus belrlin");
 
 #print "\nCalcolo infomazioni tag";
 

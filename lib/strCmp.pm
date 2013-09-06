@@ -69,36 +69,58 @@ sub fndCollapse ($$) {
 	return ( $str2 =~ /$str1/ig ? 1 : 0);		#	return true if str1 is in str2
 }
 
-sub LevenshteinLen ($$) {
+sub damerauLevenshteinLenght ($$) {
 	my @arStr1 = strToArray(lc shift);
 	my @arStr2 = strToArray(lc shift);
 	
+	
+	my @DA;
 	my @d;
 	
-	for my $indx (0..scalar @arStr1 ) {																#	Levenshtein matrix init ( x axe)
-		$d[$indx][0] =  $indx;
+	my $cost = 0;
+	my $strSum = scalar @arStr1 + scalar @arStr2;
+	
+	$d[0][0] = $strSum;
+	
+	for my $indx (0..scalar @arStr1 + 1) {																#	Levenshtein matrix init ( x axe)
+		$d[$indx + 1][1] =  $indx;
+		$d[$indx + 1][0] =  $strSum;
 	}
 	
-	for my $indx (0..scalar @arStr2 ) {																#	Levenshtein matrix init ( y axe)
-		$d[0][$indx] =  $indx;
+	for my $indx (0..scalar @arStr2 + 1) {																#	Levenshtein matrix init ( y axe)
+		$d[1][$indx + 1] =  $indx;
+		$d[0][$indx + 1] =  $strSum;
 	}
 	
-	for my $y (1..scalar @{ $d[0] } - 1) {
-		for my $x (1..scalar @d - 1 ) {
-			if ( $arStr1[$x - 1] eq $arStr2[$y - 1] ) {
-				$d[$x][$y] = $d[$x - 1][$y - 1];
-			}
-			else {
-				$d[$x][$y] = min( 
-								$d[$x - 1][$y] + 1, 				#	deletion
-								$d[$x][$y - 1] + 1, 				#	insertion
-								$d[$x - 1][$y - 1] + 1 );			#	substitution
-			}
-		}
-	}
 	
-	return $d[scalar @d - 1][scalar @{ $d[0] } - 1];
+	
+	for my $index (0..94) { $DA[$index] = 0 };
+
+	
+	for my $i (1..scalar @arStr1 + 1) {
+		my $DB = 0;
+		
+		for my $j (1..scalar @arStr2 + 1) {
 			
+			my $i1 = $DA[$arStr2[$j - 1]];
+			my $j1 = $DB;
+			
+			$cost = 1;
+			
+			$cost = 0 if $arStr1[$i - 1] eq $arStr2[$j - 1];
+			
+			$DB = $j if $cost == 0;
+			
+			$d[$i+1][$j+1] = min (	$d[$i][$j] + $cost, 
+									$d[$i + 1][$j] + 1, 
+							 min (	$d[$i][$j + 1] + 1, 
+									$d[$i1][$j1] + ($i - $i1 - 1 ) + 1 + ($j - $j1 - 1 )
+								));
+			
+		}
+		$DA[$arStr1[$i - 1]] = $i;
+	}
+	return $d[scalar @d - 1][scalar @{ $d[0] } - 1];			
 }	
 
 1;
