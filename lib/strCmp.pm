@@ -59,7 +59,7 @@ sub fndLiteral ($$) {
 	fndCollapse(string: string_to_find, string: string_were_find)
 
 	ex:
-	my $found = fndCollapse("llo wor", "Hello -#%£ world");
+	my $found = fndCollapse("llo wor", "Hello -- world");
 
 	NOTE: 
 	Return 1 if string is found into the other string
