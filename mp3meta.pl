@@ -35,7 +35,7 @@ use MP3::Tag;
 use lib::ARG;;
 use lib::PATH;
 use lib::MP3;
-use lib::strCmp;
+use lib::strMatcher;
 
 
 use threads;
@@ -81,7 +81,9 @@ foreach my $file (@files) {
 	}
 }
 
-print damerauLevenshteinLenght("ramstein","live ramstein aus belrlin");
+my $str1 = "inoki";
+my $str2 = "ioki fead madame moiselle";
+print strCmp($str1,$str2);
 
 #print "\nCalcolo infomazioni tag";
 

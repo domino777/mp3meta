@@ -22,6 +22,25 @@
 #       @contact        : domyno88 at gmail dot com
 #       @version        : 0.1
 
+=pod
+
+---------------------------------------------------------------------------------------------------
+
+=head3	min & max
+
+	min(value1, value2, ...)
+	max(value1, value2, ...)
+
+	ex:
+	my $val = max($val1, $val2, $val3, @vals);
+
+	NOTE: 
+	Return the minimum/maximum value in a given range of value
+
+---------------------------------------------------------------------------------------------------
+
+=cut
+
 sub min {
 	
 	my $val		= shift;
